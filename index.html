@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blood Donation & Request System</title>
+    <style>
+        /* Body Styling with Gradient Background */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #ff6f61, #ffcc00);
+            background-attachment: fixed;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Container Styling */
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 20px auto;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+        }
+
+        /* Heading Styling */
+        h1 {
+            text-align: center;
+            color: #d32f2f;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        /* Form Container Styling */
+        .form-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        /* Form Styling */
+        .form-container form {
+            width: 48%;
+            padding: 20px;
+            border-radius: 12px;
+            background-color: #fff;
+            border: 2px solid #d32f2f;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Input, Select, and Textarea Styling */
+        .form-container input,
+        .form-container select,
+        .form-container textarea {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-container input:focus,
+        .form-container select:focus,
+        .form-container textarea:focus {
+            border-color: #d32f2f;
+            outline: none;
+        }
+
+        /* Button Styling */
+        .form-container button {
+            width: 100%;
+            padding: 12px;
+            background-color: #d32f2f;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        .form-container button:hover {
+            background-color: #c62828;
+        }
+
+        /* Image Preview Styling */
+        .form-container .image-preview {
+            max-width: 100%;
+            max-height: 200px;
+            margin-top: 10px;
+            border-radius: 8px;
+            border: 2px solid #d32f2f;
+            display: block;
+        }
+
+        /* Error Message Styling */
+        .form-container .error {
+            color: red;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        /* Match Result Styling */
+        .match-result {
+            margin-top: 20px;
+            text-align: center;
+            padding: 15px;
+            background-color: #e8f5e9;
+            border-radius: 8px;
+            color: #388e3c;
+            border: 2px solid #388e3c;
+        }
+
+        /* Alert Styling */
+        .alert {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #ffebee;
+            border-radius: 8px;
+            color: #d32f2f;
+            text-align: center;
+            border: 2px solid #d32f2f;
+        }
+
+        /* Matched Donor Image Styling */
+        .matched-donor-image {
+            max-width: 100px;
+            max-height: 100px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .form-container {
+                flex-direction: column;
+            }
+            .form-container form {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Blood Donation & Request System</h1>
+
+        <div class="form-container">
+            <!-- Blood Donor Form -->
+            <form id="donor-form">
+                <h3>Donor Registration</h3>
+                <input type="text" id="donor-name" placeholder="Full Name" required>
+                <input type="tel" id="donor-phone" placeholder="Phone Number" required>
+                <input type="date" id="donor-dob" placeholder="Date of Birth" required>
+                <span id="age-error" class="error"></span>
+                <select id="donor-blood-type" required>
+                    <option value="">Select Blood Type</option>
+                    <option value="A+">A+</option>
+                    <option value="B+">B+</option>
+                    <option value="O+">O+</option>
+                    <option value="AB+">AB+</option>
+                    <option value="A-">A-</option>
+                    <option value="B-">B-</option>
+                    <option value="O-">O-</option>
+                    <option value="AB-">AB-</option>
+                </select>
+                <input type="file" id="donor-image" accept="image/*" onchange="previewImage(event)">
+                <img id="donor-image-preview" class="image-preview" src="#" alt="Donor Image Preview">
+                <textarea id="donor-address" placeholder="Address" required></textarea>
+                <select id="donor-district" required onchange="loadUpazilas('donor')">
+                    <option value="">Select District</option>
+                    <option value="Dhaka">Dhaka</option>
+                    <option value="Chittagong">Chittagong</option>
+                    <option value="Sylhet">Sylhet</option>
+                    <option value="Rajshahi">Rajshahi</option>
+                    <option value="Khulna">Khulna</option>
+                    <option value="Barishal">Barishal</option>
+                    <option value="Rangpur">Rangpur</option>
+                    <option value="Mymensingh">Mymensingh</option>
+                </select>
+                <select id="donor-upazila" required>
+                    <option value="">Select Upazila</option>
+                </select>
+                <button type="submit">Register as Donor</button>
+            </form>
+
+            <!-- Blood Request Form -->
+            <form id="request-form">
+                <h3>Request Blood</h3>
+                <input type="text" id="request-name" placeholder="Full Name" required>
+                <input type="tel" id="request-phone" placeholder="Phone Number" required>
+                <select id="request-blood-type" required>
+                    <option value="">Select Blood Type</option>
+                    <option value="A+">A+</option>
+                    <option value="B+">B+</option>
+                    <option value="O+">O+</option>
+                    <option value="AB+">AB+</option>
+                    <option value="A-">A-</option>
+                    <option value="B-">B-</option>
+                    <option value="O-">O-</option>
+                    <option value="AB-">AB-</option>
+                </select>
+                <textarea id="request-address" placeholder="Address" required></textarea>
+                <select id="request-district" required onchange="loadUpazilas('request')">
+                    <option value="">Select District</option>
+                    <option value="Dhaka">Dhaka</option>
+                    <option value="Chittagong">Chittagong</option>
+                    <option value="Sylhet">Sylhet</option>
+                    <option value="Rajshahi">Rajshahi</option>
+                    <option value="Khulna">Khulna</option>
+                    <option value="Barishal">Barishal</option>
+                    <option value="Rangpur">Rangpur</option>
+                    <option value="Mymensingh">Mymensingh</option>
+                </select>
+                <select id="request-upazila" required>
+                    <option value="">Select Upazila</option>
+                </select>
+                <button type="submit">Request Blood</button>
+            </form>
+        </div>
+
+        <div class="match-result" id="match-result"></div>
+
+        <div class="alert" id="alert" style="display:none;"></div>
+    </div>
+
+    <script>
+        // Donor & Request Data
+        let donors = [];
+        let requests = [];
+
+        // District-wise Upazilas Data
+        const upazilas = {
+            Dhaka: ["Mirpur", "Uttara", "Gulshan", "Banani", "Dhanmondi"],
+            Chittagong: ["Chandgaon", "Double Mooring", "Kotwali", "Pahartali"],
+            Sylhet: ["Sylhet Sadar", "Beanibazar", "Golapganj", "Kanaighat"],
+            Rajshahi: ["Rajshahi Sadar", "Bagha", "Charghat", "Puthia"],
+            Khulna: ["Khulna Sadar", "Batiaghata", "Dacope", "Dumuria"],
+            Barishal: ["Barishal Sadar", "Bakerganj", "Babuganj", "Agailjhara"],
+            Rangpur: ["Rangpur Sadar", "Badarganj", "Gangachara", "Kaunia"],
+            Mymensingh: ["Mymensingh Sadar", "Fulbaria", "Gaffargaon", "Ishwarganj"]
+        };
+
+        // Function to load upazilas based on selected district
+        function loadUpazilas(formType) {
+            const districtSelect = document.getElementById(`${formType}-district`);
+            const upazilaSelect = document.getElementById(`${formType}-upazila`);
+            const selectedDistrict = districtSelect.value;
+
+            // Clear previous upazilas
+            upazilaSelect.innerHTML = '<option value="">Select Upazila</option>';
+
+            // Load upazilas for the selected district
+            if (selectedDistrict && upazilas[selectedDistrict]) {
+                upazilas[selectedDistrict].forEach(upazila => {
+                    const option = document.createElement("option");
+                    option.value = upazila;
+                    option.textContent = upazila;
+                    upazilaSelect.appendChild(option);
+                });
+            }
+        }
+
+        // Image Preview Function
+        function previewImage(event) {
+            const reader = new FileReader();
+            reader.onload = function() {
+                const preview = document.getElementById('donor-image-preview');
+                preview.src = reader.result;
+                preview.style.display = 'block';
+            };
+            reader.readAsDataURL(event.target.files[0]);
+        }
+
+        // Handle Donor Form Submit
+        document.getElementById('donor-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('donor-name').value;
+            const phone = document.getElementById('donor-phone').value;
+            const dob = document.getElementById('donor-dob').value;
+            const bloodType = document.getElementById('donor-blood-type').value;
+            const address = document.getElementById('donor-address').value;
+            const district = document.getElementById('donor-district').value;
+            const upazila = document.getElementById('donor-upazila').value;
+            const image = document.getElementById('donor-image').files[0];
+
+            // Check if the donor is 18+
+            const age = new Date().getFullYear() - new Date(dob).getFullYear();
+            if (age < 18) {
+                document.getElementById('age-error').textContent = "You must be at least 18 years old to donate blood.";
+                return;
+            } else {
+                document.getElementById('age-error').textContent = "";
+            }
+
+            // Save Donor Information
+            donors.push({ name, phone, dob, bloodType, address, district, upazila, image });
+            document.getElementById('donor-form').reset();
+            document.getElementById('donor-image-preview').style.display = 'none';
+
+            alert('Thank you for registering as a donor!');
+        });
+
+        // Handle Request Form Submit
+        document.getElementById('request-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('request-name').value;
+            const phone = document.getElementById('request-phone').value;
+            const bloodType = document.getElementById('request-blood-type').value;
+            const address = document.getElementById('request-address').value;
+            const district = document.getElementById('request-district').value;
+            const upazila = document.getElementById('request-upazila').value;
+
+            // Save Request Information
+            requests.push({ name, phone, bloodType, address, district, upazila });
+
+            // Match Donors with Requests
+            const matchedDonors = donors.filter(donor => 
+                donor.bloodType === bloodType && 
+                donor.district === district && 
+                donor.upazila === upazila
+            );
+
+            if (matchedDonors.length > 0) {
+                let matchDetails = "<h4>Matched Donors:</h4><ul>";
+                matchedDonors.forEach((donor, index) => {
+                    matchDetails += `
+                        <li>
+                            <strong>Name:</strong> ${donor.name}<br>
+                            <strong>Phone:</strong> ${donor.phone}<br>
+                            <strong>Blood Type:</strong> ${donor.bloodType}<br>
+                            <strong>District:</strong> ${donor.district}<br>
+                            <strong>Upazila:</strong> ${donor.upazila}<br>
+                            <strong>Address:</strong> ${donor.address}<br>
+                            ${donor.image ? `<img src="${URL.createObjectURL(donor.image)}" alt="Donor Image" class="matched-donor-image">` : ''}
+                            <button onclick="removeDonor(${index})">Remove Donor</button>
+                        </li>
+                    `;
+                });
+                matchDetails += "</ul>";
+                document.getElementById('match-result').innerHTML = matchDetails;
+                document.getElementById('alert').style.display = 'none';
+
+                // Show a message to the requester to pray for the donor
+                alert("Please pray for the donor who helped you!");
+            } else {
+                document.getElementById('match-result').innerHTML = "";
+                document.getElementById('alert').style.display = 'block';
+                document.getElementById('alert').innerHTML = "Sorry, no matching donors found for this request.";
+            }
+        });
+
+        // Function to remove a donor after donation
+        function removeDonor(index) {
+            donors.splice(index, 1); // Remove the donor from the list
+            document.getElementById('match-result').innerHTML = ""; // Clear the match result
+            alert("Donor removed successfully. Thank you for donating blood!");
+        }
+    </script>
+</body>
+</html>
